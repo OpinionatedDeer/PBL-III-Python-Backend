@@ -10,3 +10,6 @@ JWTSECRETKEY = os.getenv("JWTSECRETKEY")
 
 # Database settings
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+#Setup Process
+SETUP=os.getenv("SETUP")
