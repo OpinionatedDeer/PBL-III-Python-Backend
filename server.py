@@ -27,20 +27,46 @@ app.add_middleware(
 
 # SETUP MODE
 async def setup_mode():
-	db_exists = await db.has_data()
+    db_exists = await db.has_data()
 
-	if db_exists:
-		choice = input("DB exists. Delete and reset? (y/n): ").strip().lower()
-		if choice != "y":
-			return
+    if db_exists:
+        choice = input("DB exists. Delete and reset? (y/n): ").strip().lower()
+        if choice != "y":
+            return
 
-	await db.reset_db()
+    await db.reset_db()
+    print("Reset DB complete")
 
-	with open("schema.sql", "r") as f:
-		sql = f.read()
+    choice = input("Setup db in fresh environment? (y/n): ").strip().lower()
+    if choice != "y":
+        return
 
-	await db.execute_script(sql)
+    try:
+        with open("schema.sql", "r") as f:
+            sql = f.read()
 
+        await db.execute_script(sql)
+        print("DB setup done")
+
+        await db.create_default_admin()
+        print("Created a default admin user")
+
+        # Update SETUP=true -> SETUP=false
+        with open(".env", "r") as f:
+            lines = f.readlines()
+
+        with open(".env", "w") as f:
+            for line in lines:
+                if line.strip().startswith("SETUP="):
+                    f.write("SETUP=false\n")
+                else:
+                    f.write(line)
+
+        print("Setup complete")
+
+    except Exception as e:
+        print(f"Setup failed: {e}")
+        raise
 
 @app.on_event("startup")
 async def startup():

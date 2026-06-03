@@ -4,6 +4,7 @@ import os
 import psycopg_pool
 import contextlib
 import psycopg.rows
+import bcrypt
 #Local import
 from config import DATABASE_URL
 
@@ -70,12 +71,58 @@ async def execute_script(sql: str):
     """
     async with pool.connection() as conn:
         async with conn.cursor() as cur:
-
-            statements = sql.split(";")
-
-            for stmt in statements:
-                stmt = stmt.strip()
-                if stmt:
-                    await cur.execute(stmt + ";")
+            await cur.execute(sql)
 
         await conn.commit()
+
+async def create_default_admin():
+    email = "admin@gmail.com"
+    username = "admin"
+    password = "admin@1234"
+    user_role = "sys_admin"
+    status = "active"
+    first_name = "System"
+    last_name = "Admin"
+
+    async with getDictCursor() as cur:
+        await cur.execute(
+            "SELECT id FROM user_account WHERE username = %s",
+            (username,)
+        )
+
+        if await cur.fetchone():
+            print("Default admin already exists")
+            return
+
+        hashed = bcrypt.hashpw(
+            password.encode(),
+            bcrypt.gensalt()
+        ).decode()
+
+        await cur.execute(
+            """
+            INSERT INTO user_info (first_name, last_name)
+            VALUES (%s, %s)
+            RETURNING id
+            """,
+            (first_name, last_name)
+        )
+
+        user_info_id = (await cur.fetchone())["id"]
+
+        await cur.execute(
+            """
+            INSERT INTO user_account
+            (email, username, hash, user_role, status, user_info_id)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            (
+                email,
+                username,
+                hashed,
+                user_role,
+                status,
+                user_info_id,
+            )
+        )
+
