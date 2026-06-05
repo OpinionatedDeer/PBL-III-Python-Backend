@@ -15,5 +15,6 @@ This is a basic python based backend designed to support real-time intercommunia
 2. Create a virtual environment of python using 'python3 -m venv venv'
 3. Activate virtual environment 'source venv/bin/activate'
 4. Run 'pip install -r requirements.txt'
-5. Run the server 'python3 server.py'
+5. edit .env file 
+6. Run the server 'python3 server.py'
 
