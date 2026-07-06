@@ -48,6 +48,7 @@ END $$;
 
 CREATE TABLE message (
     id SERIAL PRIMARY KEY,
+    channel_id INTEGER REFERENCES channel(id),
     sender INTEGER REFERENCES user_account(id),
     user_account_id INTEGER REFERENCES user_account(id),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
