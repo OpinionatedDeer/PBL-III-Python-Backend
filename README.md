@@ -18,3 +18,6 @@ This is a basic python based backend designed to support real-time intercommunia
 5. edit .env file 
 6. Run the server 'python3 server.py'
 
+## Compatible Frontend
+[Frontend](https://github.com/KartikaySrivastava258/PBL-PYTHON-FRONTEND-MAIN)
+- By [KartikaySrivastava258](https://github.com/KartikaySrivastava258)
